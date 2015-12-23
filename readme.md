@@ -23,11 +23,6 @@ source venv/bin/activate
 ```
 nosetests test/*
 ```
-### Testing
-
-```
-nosetests test/*
-```
 
 ### Using
 
