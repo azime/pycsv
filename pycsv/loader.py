@@ -25,7 +25,11 @@ class Loader(object):
 
     @property
     def cols_count(self):
-        return len(self.header)
+        if self.with_header:
+            return len(self.header)
+        if self.row_count:
+            return len(self.data[0])
+        return 0
 
     def __check_headers(self, required_headers):
         if not required_headers:
@@ -36,8 +40,11 @@ class Loader(object):
             if r_header not in self.header:
                 return False
 
-    def __add_index_column(self, columns):
+    def __add_and_check_index_column(self, columns):
         for column in columns:
+            if not self.with_header:
+                if "index" not in column:
+                    raise PyCsvInvalidColumn("Column invalid, index is required, you give : {column}".format(column=column))
             if "type" not in column:
                 raise PyCsvInvalidType("Column invalid.")
             if column["type"] not in self.type_collection:
@@ -45,7 +52,8 @@ class Loader(object):
             if column["type"] == "datetime" and "format" not in column:
                 raise PyCsvInvalidType("Format date is required. you give :{col}".format(col=column["type"]))
             try:
-                column["index"] = self.header.index(column["column"])
+                if self.with_header:
+                    column["index"] = self.header.index(column["column"])
             except ValueError:
                 raise PyCsvInvalidColumn("Column {column} invalid.".format(column=column["column"]))
 
@@ -122,7 +130,7 @@ class Loader(object):
 
         for row in reader:
             if len(row) > 0:
-                if len(row) != len(self.header):
+                if self.with_header and len(row) != len(self.header):
                     csvfile.close()
                     raise PyCsvInvalidFile("Invalid file, invalid cloumns number!")
                 self.data.append([r.strip() for r in row])
@@ -152,6 +160,6 @@ class Loader(object):
                     {"column": "column1", "type": "integer"}
                     {"column": "column1", "type": "datetime", "format": "%Y%m%d"}]
         '''
-        self.__add_index_column(columns)
+        self.__add_and_check_index_column(columns)
         self.data.sort(key=self.__sort_func(columns))
     

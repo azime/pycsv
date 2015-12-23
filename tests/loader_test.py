@@ -122,3 +122,23 @@ def test_sort_separator_in_string():
     loader = Loader("tests/fixtures")
     loader.fill_file("separator_in_string.txt")
     eq_(loader.get_value(0, 0),"aa,bb")
+
+
+def test_file_without_headers():
+    loader = Loader("tests/fixtures", False, ";")
+    loader.fill_file("file_without_headers.txt")
+    eq_(loader.cols_count, 2)
+    eq_(loader.rows_count, 4)
+    loader.sort_by([{"index": 0, "type": "integer"}])
+    eq_(loader.get_value(0, 0),"0")
+    eq_(loader.get_value(0, 1),"1")
+    eq_(loader.get_value(0, 2),"2")
+    eq_(loader.get_value(0, 3),"3")
+
+@raises(PyCsvInvalidColumn)
+def test_file_without_headers_sort_without_index():
+    loader = Loader("tests/fixtures", False, ";")
+    loader.fill_file("file_without_headers.txt")
+    eq_(loader.cols_count, 2)
+    eq_(loader.rows_count, 4)
+    loader.sort_by([{"type": "integer"}])
