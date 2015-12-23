@@ -21,7 +21,6 @@ source venv/bin/activate
 ### Testing
 
 ```
-pip install -r requirements-dev.txt
 nosetests test/*
 ```
 ### Testing
