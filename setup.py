@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 
 from setuptools import setup, find_packages
+import pycsv
 
 setup(
     name='pycsv',
-    version='0.1.0',
+    version=pycsv.__version__,
     url='https://www.github.com/azime/pycsv/',
     author='Abderrahim AZIME',
     author_email='azime_1@yahoo.fr',
@@ -14,7 +15,8 @@ setup(
     include_package_data=True,
     platforms='any',
     test_suite = 'nose.collector',
-    #setup_requires=[
-    #    'nose==1.3.3',
-    #],
+    classifiers=[
+        "Programming Language :: Python",
+        "Programming Language :: Python :: 2.7"
+    ]
 )

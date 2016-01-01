@@ -142,3 +142,14 @@ def test_file_without_headers_sort_without_index():
     eq_(loader.cols_count, 2)
     eq_(loader.rows_count, 4)
     loader.sort_by([{"type": "integer"}])
+
+def test_file_float():
+    loader = Loader("tests/fixtures")
+    loader.fill_file("sort_float.txt")
+    eq_(loader.cols_count, 2)
+    eq_(loader.rows_count, 4)
+    loader.sort_by([{"column": "col1", "type": "float"}])
+    eq_(loader.get_value(0, 0),"1.5")
+    eq_(loader.get_value(0, 1),"2.3")
+    eq_(loader.get_value(0, 2),"10")
+    eq_(loader.get_value(0, 3),"20")

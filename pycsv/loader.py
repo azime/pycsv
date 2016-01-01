@@ -14,7 +14,7 @@ class Loader(object):
         self.separator = separator
         self.data = []
         self.header = []
-        self.type_collection = ["integer", "string", "datetime"]
+        self.type_collection = ["integer", "string", "datetime", "float"]
         if not os.path.exists(self.path):
             msg = 'Path not exist, you give {path}'.format(path=self.path)
             raise PyCsvExcept(msg)
@@ -63,6 +63,8 @@ class Loader(object):
             for column in columns:
                 if column["type"] == "integer":
                     result.append(self.__to_int(item[column["index"]]))
+                if column["type"] == "float":
+                    result.append(self.__to_float(item[column["index"]]))
                 if column["type"] == "datetime":
                     result.append(self.__to_date(item[column["index"]], column["format"]))
                 if column["type"] == "string":
@@ -75,6 +77,12 @@ class Loader(object):
             return int(value)
         except ValueError:
             raise PyCsvInvalidCast("Impossible to convert {v} to integer.".format(v=value))
+
+    def __to_float(self, value):
+        try:
+            return float(value)
+        except ValueError:
+            raise PyCsvInvalidCast("Impossible to convert {v} to float.".format(v=value))
 
     def __to_date(self, value, fromat_date):
         try:
@@ -158,7 +166,9 @@ class Loader(object):
         :param column:
             values : [{"column": "column1", "type": "string"}
                     {"column": "column1", "type": "integer"}
-                    {"column": "column1", "type": "datetime", "format": "%Y%m%d"}]
+                    {"column": "column1", "type": "datetime", "format": "%Y%m%d"},
+                    {"column": "column1", "type": "datetime", "format": "%H:%M"},
+                    {"column": "column1", "type": "float"}]
         '''
         self.__add_and_check_index_column(columns)
         self.data.sort(key=self.__sort_func(columns))
