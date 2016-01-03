@@ -22,6 +22,12 @@ source venv/bin/activate
 nosetests test/*
 ```
 
+###Installation
+
+`
+pip install pycsv
+`
+
 ### Using
 
  ```
