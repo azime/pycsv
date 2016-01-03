@@ -32,7 +32,7 @@ pip install pycsv
 
 # Using
 
-`
+
 
     from pycsv.loader import Loader
     from pycsv.exceptions import PyCsvExcept, PyCsvInvalidColumn, PyCsvInvalidType
@@ -53,6 +53,6 @@ pip install pycsv
                 print e.message
         except PyCsvExcept, e:
             print 'exception !!!: ', e.message
-`
+
 
 See examples
