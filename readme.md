@@ -30,6 +30,12 @@ nosetests test/*
 pip install pycsv
 `
 
+# PyPi
+
+This package is available on PyPi
+
+[her](https://pypi.python.org/pypi/pycsv)
+
 # Using
 
 
