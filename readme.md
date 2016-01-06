@@ -34,7 +34,7 @@ pip install pycsv
 
 This package is available on PyPi
 
-[her](https://pypi.python.org/pypi/pycsv)
+[https://pypi.python.org/pypi/pycsv](https://pypi.python.org/pypi/pycsv)
 
 # Using
 
