@@ -118,10 +118,10 @@ class Loader(object):
             return False
         return True
 
-    def get_value(self, col, row):
+    def get_value(self, row, col):
         '''
         :param col: 0 to self.cols_count
-        :param row: 0 to self.cols_count
+        :param row: 0 to self.rows_count
         :return: value or except PyCsvOutBound
         '''
 
