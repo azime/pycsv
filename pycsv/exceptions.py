@@ -29,3 +29,7 @@ class PyCsvOutBound(Exception):
 class PyCsvInvalidFile(Exception):
     def __init__(self, msg):
         self.message = 'PyCsv :' + msg
+
+class PyCsvInvalidOrder(Exception):
+    def __init__(self, msg):
+        self.message = 'PyCsv :' + msg

@@ -1,7 +1,7 @@
 # coding=utf-8
 
 from exceptions import PyCsvExcept, PyCsvRequiredHeader, PyCsvInvalidColumn, \
-    PyCsvInvalidCast, PyCsvInvalidType, PyCsvOutBound, PyCsvInvalidFile
+    PyCsvInvalidCast, PyCsvInvalidType, PyCsvOutBound, PyCsvInvalidFile, PyCsvInvalidOrder
 import os
 import csv
 from datetime import datetime
@@ -15,6 +15,7 @@ class Loader(object):
         self.data = []
         self.header = []
         self.type_collection = ["integer", "string", "datetime", "float"]
+        self.columns = []
         if not os.path.exists(self.path):
             msg = 'Path not exist, you give {path}'.format(path=self.path)
             raise PyCsvExcept(msg)
@@ -41,10 +42,29 @@ class Loader(object):
                 return False
 
     def __add_and_check_index_column(self, columns):
+        ret_value = {
+            "asc": {
+                "=": 0,
+                ">": 1,
+                "<": -1
+            },
+            "desc": {
+                "=": 0,
+                ">": -1,
+                "<": 1
+            }
+        }
         for column in columns:
             if not self.with_header:
                 if "index" not in column:
-                    raise PyCsvInvalidColumn("Column invalid, index is required, you give : {column}".format(column=column))
+                    raise PyCsvInvalidColumn("Column invalid, index is required, you give : {column}".
+                                             format(column=column))
+            if "order" not in column:
+                column["order"] = "asc"
+            column["order"] = column["order"].lower()
+            if column["order"] not in ["asc", "desc"]:
+                raise PyCsvInvalidOrder("Order invalid, you give : {order}".format(order=column["order"]))
+            column["order"] = ret_value[column["order"]]
             if "type" not in column:
                 raise PyCsvInvalidType("Column invalid.")
             if column["type"] not in self.type_collection:
@@ -56,11 +76,12 @@ class Loader(object):
                     column["index"] = self.header.index(column["column"])
             except ValueError:
                 raise PyCsvInvalidColumn("Column {column} invalid.".format(column=column["column"]))
+            self.columns.append(column)
 
-    def __sort_func(self, columns):
-        def sort_func(item):
+    def __itemgetter(self):
+        def get_item(item):
             result =[]
-            for column in columns:
+            for column in self.columns:
                 if column["type"] == "integer":
                     result.append(self.__to_int(item[column["index"]]))
                 if column["type"] == "float":
@@ -70,7 +91,7 @@ class Loader(object):
                 if column["type"] == "string":
                     result.append(item[column["index"]])
             return tuple(result)
-        return sort_func
+        return get_item
 
     def __to_int(self, value):
         try:
@@ -161,15 +182,29 @@ class Loader(object):
             return len(content)
         return -1
 
+    def __order(self, item1, item2):
+        def order_by(pos, item1, item2):
+            while pos < len(self.columns):
+                column = self.columns[pos]
+                if item1[pos] > item2[pos]:
+                    return column["order"][">"]
+                if item1[pos] < item2[pos]:
+                    return column["order"]["<"]
+                if pos == len(self.columns):
+                    return column["order"]["="]
+                else:
+                    pos = pos + 1
+                    order_by(pos, item1, item2)
+        return order_by(0, item1, item2)
+
     def sort_by(self, columns):
         '''
         :param column:
-            values : [{"column": "column1", "type": "string"}
+            values : [{"column": "column1", "type": "string", "order": "desc"}
                     {"column": "column1", "type": "integer"}
                     {"column": "column1", "type": "datetime", "format": "%Y%m%d"},
                     {"column": "column1", "type": "datetime", "format": "%H:%M"},
                     {"column": "column1", "type": "float"}]
         '''
         self.__add_and_check_index_column(columns)
-        self.data.sort(key=self.__sort_func(columns))
-    
+        self.data.sort(cmp=self.__order, key=self.__itemgetter())
