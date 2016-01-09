@@ -1,6 +1,6 @@
 from nose.tools import *
 from pycsv.exceptions import PyCsvExcept, PyCsvInvalidType, PyCsvInvalidCast, PyCsvInvalidColumn, \
-    PyCsvOutBound, PyCsvInvalidFile, PyCsvRequiredHeader
+    PyCsvOutBound, PyCsvInvalidFile, PyCsvRequiredHeader, PyCsvInvalidOrder
 from pycsv.loader import Loader
 
 
@@ -94,6 +94,12 @@ def test_sort_column_invalid():
     loader.fill_file("sort_with_2_columns.txt")
     loader.sort_by([{"column": "column10", "type": "integer"}])
 
+@raises(PyCsvInvalidOrder)
+def test_sort_column_order_invalid():
+    loader = Loader("tests/fixtures")
+    loader.fill_file("sort_with_2_columns.txt")
+    loader.sort_by([{"column": "column1", "type": "integer", "order": "bobo"}])
+
 
 @raises(PyCsvOutBound)
 def test_sort_column_out_invalid():
@@ -153,3 +159,31 @@ def test_file_float():
     eq_(loader.get_value(0, 1),"2.3")
     eq_(loader.get_value(0, 2),"10")
     eq_(loader.get_value(0, 3),"20")
+
+
+def test_sort_columns_desc():
+    loader = Loader("tests/fixtures")
+    loader.fill_file("sort_with_2_columns.txt")
+    loader.sort_by([{"column": "column1", "type": "string"},
+            {"column": "column3", "type": "datetime", "format": "%H:%M", "order": "desc"}])
+
+    eq_(loader.get_value(0, 0), "c0")
+    eq_(loader.get_value(0, 1), "c0")
+    eq_(loader.get_value(0, 2), "c0")
+    eq_(loader.get_value(0, 3), "c0")
+    eq_(loader.get_value(0, 4), "c0")
+    eq_(loader.get_value(0, 5), "c0")
+    eq_(loader.get_value(0, 6), "c1")
+    eq_(loader.get_value(0, 7), "c1")
+    eq_(loader.get_value(0, 8), "c1")
+
+    eq_(loader.get_value(2, 0), "12:00")
+    eq_(loader.get_value(2, 1), "11:50")
+    eq_(loader.get_value(2, 2), "11:40")
+    eq_(loader.get_value(2, 3), "11:15")
+    eq_(loader.get_value(2, 4), "11:00")
+    eq_(loader.get_value(2, 5), "10:15")
+    eq_(loader.get_value(2, 6), "16:40")
+    eq_(loader.get_value(2, 7), "10:50")
+    eq_(loader.get_value(2, 8), "10:20")
+
