@@ -2,7 +2,7 @@
 
 * 0.3.0
     * order data by columns desc, asc: asc default value
-    * rename get_value(self, col, row) by get_value(self, row, col), <b style='color:red'>SORRY !</b>
+    * rename get_value(self, col, row) by get_value(self, row, col), SORRY !!!
     
 * 0.2.0
     * order data by columns and column type: float
